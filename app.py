@@ -7,9 +7,19 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 st.title('Rogue Inteligent Movie Recomendation systems')
 
-dt = pd.read_csv('path.csv')
-df = pd.read_csv('out.csv')
-random_subset = dt.head(5)
+
+@st.cache
+def get_dataframes():
+    df = pd.read_csv('out.csv')
+
+    return df
+
+@st.cache
+def get_random_subset():
+    dt = pd.read_csv('path.csv')
+    return dt.sample(n=5)
+
+random_subset = get_random_subset()
 
 key = 0
 ratings = []
@@ -26,11 +36,6 @@ def standardize(row):
     return new_row
 
 
-ratings_std = df.apply(standardize)
-item_similarity = cosine_similarity(ratings_std.T)
-item_similarity_df = pd.DataFrame(item_similarity, index=df.columns, columns=df.columns)
-
-
 def get_similar_movies(movie_name,user_rating):
     similar_score = item_similarity_df[movie_name]*(user_rating-2.5)
     similar_score = similar_score.sort_values(ascending=False)
@@ -39,6 +44,11 @@ def get_similar_movies(movie_name,user_rating):
 similar_movies = pd.DataFrame()
 
 if st.button('SUBMIT'):
+    df = get_dataframes()
+    ratings_std = df.apply(standardize)
+    item_similarity = cosine_similarity(ratings_std.T)
+    item_similarity_df = pd.DataFrame(item_similarity, index=df.columns, columns=df.columns)
+
     data_set = np.array((movies,ratings)).T
 
     for movie,rating in data_set:
