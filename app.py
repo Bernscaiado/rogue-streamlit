@@ -26,16 +26,17 @@ ratings = []
 movies = []
 dt = pd.read_csv('path.csv')
 
+cols = st.beta_columns(5)
 for movie in random_subset.title:
-    key += 1
     try:
         poster = f"https://image.tmdb.org/t/p/original{dt[dt['title'] == movie].poster_path.values[0]}"
     except:
         poster = 'https://image.tmdb.org/t/p/original//gTnaTysN8HsvVQqTRUh8m35mmUA.jpg'
-    st.image(poster, width=150)
-    st.write(movie)
+    cols[key].image(poster, width=150)
+    cols[key].write(movie)
     movies.append(movie)
-    ratings.append(st.number_input('Give a Rating', key=key, min_value=1,max_value=5))
+    ratings.append(cols[key].number_input('Give a Rating', key=key, min_value=1,max_value=5))
+    key += 1
 
 def standardize(row):
     new_row = (row - row.mean()) / (row.max() - row.min())
