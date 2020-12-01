@@ -7,6 +7,31 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 st.title('Rogue Inteligent Movie Recomendation systems')
 
+image_size = st.slider('Zoom', 50, 250, 119)
+
+
+MOVIE_CSS = f"""
+    #teachers {{
+        display: flex;
+        flex-wrap: wrap;
+    }}
+    .teacher-card {{
+        display: flex;
+        flex-direction: column;
+    }}
+    .teacher-card img {{
+        width: {image_size}px;
+        height: {image_size}px;
+        border-radius: 100%;
+        padding: 4px;
+        margin: 10px;
+        box-shadow: 0 0 4px #eee;
+    }}
+    .teacher-card span {{
+        text-align: center;
+    }}
+    """
+
 
 @st.cache
 def get_dataframes():
@@ -17,16 +42,22 @@ def get_dataframes():
 @st.cache
 def get_random_subset():
     dt = pd.read_csv('path.csv')
-    return dt.sample(n=5)
+    return dt.head(5)
 
 random_subset = get_random_subset()
 
 key = 0
 ratings = []
 movies = []
+dt = pd.read_csv('path.csv')
 
 for movie in random_subset.title:
     key += 1
+    try:
+        poster = f"https://image.tmdb.org/t/p/original{dt[dt['title'] == movie].poster_path.values[0]}"
+    except:
+        poster = 'https://image.tmdb.org/t/p/original//gTnaTysN8HsvVQqTRUh8m35mmUA.jpg'
+    st.markdown(f"![Alt Text]({poster})")
     st.write(movie)
     movies.append(movie)
     ratings.append(st.number_input('Give a Rating', key=key, min_value=1,max_value=5))
